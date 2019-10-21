@@ -23,6 +23,7 @@
                  [nrepl "0.6.0"]
                  [org.clojure/clojure "1.10.1"]
                  [org.clojure/tools.cli "0.4.2"]
+                 [org.clojure/clojurescript "1.10.520" :scope "provided"]
                  [org.clojure/tools.logging "0.5.0"]
                  [org.webjars.npm/bulma "0.7.5"]
                  [org.webjars.npm/material-icons "0.3.0"]
@@ -34,20 +35,42 @@
 
   :min-lein-version "2.0.0"
   
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "src/cljs" "src/cljc"]
   :test-paths ["test/clj"]
-  :resource-paths ["resources"]
+  :resource-paths ["resources" "target/cljsbuild"]
   :target-path "target/%s/"
   :main ^:skip-aot guestbook.core
 
-  :plugins []
+  :plugins [[lein-cljsbuild "1.1.3"]]
+
+  :cljsbuild
+  {:builds
+   {:app
+    {:source-paths ["src/cljs"]
+     :compiler
+     {:main          (str project-ns ".app")
+      :asset-path    "/js/out"
+      :output-to     "target/cljsbuild/public/js/app.js"
+      :output-dir    "target/cljsbuild/public/js/out"
+      :optimizations :none
+      :source-map    true
+      :pretty-print  true}}
+    :min
+    {:source-paths ["src/cljs"]
+     :compiler
+     {:output-to     "target/cljsbuild/public/js/app.js"
+      :output-dir    "target/uberjar"
+      :externs       ["react/externs/react.js"]
+      :optimizations :advanced
+      :pretty-print  false}}}}
 
   :profiles
   {:uberjar {:omit-source true
              :aot :all
              :uberjar-name "guestbook.jar"
              :source-paths ["env/prod/clj"]
-             :resource-paths ["env/prod/resources"]}
+             :resource-paths ["env/prod/resources"]
+             :prep-tasks ["compile" ["cljsbuild" "once" "min"]]}
 
    :dev           [:project/dev :profiles/dev]
    :test          [:project/dev :project/test :profiles/test]
