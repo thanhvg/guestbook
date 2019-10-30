@@ -1,0 +1,33 @@
+* figwheel repl to cider
+$ lein run
+
+and stop
+
+$ lein figwheel 
+
+then stop
+
+in spacemacs 
+, &
+cider-jack-in-clj&cljs
+
+only clj repl will be connected
+
+in cider clj repl buffer, start the app
+(start)
+
+then open web app in browser
+try , " again
+
+you will get connected to cljs 
+in the repl try:
+(js/alert "yay")
+
+figwheel repl seems to run in browser so you need to have your browser running
+the app
+
+cljs this way doesn't use -main method
+it get load from [[file:env/dev/cljs/guestbook/app.cljs::(core/init!)][dev/prod file]]
+
+of firefox you need to delete it's global cache otherwise figwheel connect.js
+will fail on hot reloading because ff keeps the version of other project
