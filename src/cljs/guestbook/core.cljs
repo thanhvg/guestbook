@@ -9,6 +9,15 @@
 ;;       (.removeChild content (.-lastChild content)))
 ;;     (.appendChild content (js/document.createTextNode "Making repl to spacemacs is hard: so i don't feel the hype at all"))))
 
+(defn send-message! [fields]
+  (POST "/add-message"
+        {:params @fields
+         :format :json
+         :headers {"Accept" "application/transit+json"
+                   "x-csrf-token" (.-csrfToken js/window)}
+         :handler #(.log js/console (str "response:" %))
+         :error-handler #(.error js/console (str "error:" %))}))
+
 (defn message-form []
   (let [fields (atom {})]
     (fn []
@@ -29,7 +38,10 @@
           :name :message
           :on-change #(swap! fields assoc :message (-> % .-target .-value))}
          (:message @fields)]]
-       [:input.btn.btn-primary {:type :submit :value "comment"}]])))
+       [:input.btn.btn-primary
+        {:type :submit
+         :on-click #(send-message! fields)
+         :value "comment"}]])))
 
 (defn home []
     [message-form])
